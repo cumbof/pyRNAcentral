@@ -86,15 +86,15 @@ def query_rnacentral( options, args, rnacentral_ids ):
                 metadata, levels = format_metadata( xrefs_json_content )
                 if len(metadata) > 0:
                     #print metadata;
-                    #print "levels: " + str(levels);
+                    #print('levels: ' + str(levels));
                     # write metadata on metadata_file_path
                     metadata_file = open(metadata_file_path, 'w')
                     header_line = ''
                     for header_attribute in metadata.keys():
                         header_line += header_attribute + '\t'
-                    metadata_file.write( header_line.strip() + '\n' )
+                    metadata_file.write( '%s\n' % header_line.strip() )
                     for level in range(0, levels):
-                        metadata_file.write( '\t'.join(metadata[attribute][level] for attribute in metadata ) + '\n' )
+                        metadata_file.write( '%s\n' % '\t'.join(metadata[attribute][level] for attribute in metadata ) )
                     metadata_file.close()
                 else:
                     something_wrong = True
@@ -107,7 +107,7 @@ def query_rnacentral( options, args, rnacentral_ids ):
             chunks, chunk_size = len( json_content['sequence'] ), 60
             seq_split = [ json_content['sequence'][i:i+chunk_size] for i in range(0, chunks, chunk_size) ]
             for seq_part in seq_split:
-                fasta_file.write( seq_part + '\n' )
+                fasta_file.write( '%s\n' % seq_part )
             fasta_file.close()
             if not something_wrong:
                 yield rnacentral_id, OK_EXIT_CODE
@@ -123,8 +123,8 @@ def retrieve_data( options, args ):
     rnacentral_ids = [ ]
     if options.id:
         if ' ' in options.id or '\t' in options.id:
-            print 'Error: the RNAcentral ID is not well formatted'
-            return raiseException( ERR_EXIT_CODE, "Error: the RNAcentral ID is not well formatted", "./", errorfile )
+            print( 'Error: the RNAcentral ID is not well formatted' )
+            return raiseException( ERR_EXIT_CODE, 'Error: the RNAcentral ID is not well formatted', './', errorfile )
         rnacentral_ids.append( options.id )
     elif options.file:
         with open(options.file) as file:
@@ -132,18 +132,18 @@ def retrieve_data( options, args ):
                 line = line.strip()
                 if line != '':
                     if ' ' in line or '\t' in line:
-                        print 'Error: the input file is not well formatted'
+                        print( 'Error: the input file is not well formatted' )
                         return raiseException( ERR_EXIT_CODE, 'Error: the input file is not well formatted', './', errorfile )
                     rnacentral_ids.append( line )
     if len(rnacentral_ids) > 0:
         for rnacentral_id, exit_code in query_rnacentral( options, args, rnacentral_ids ):
             if exit_code == 0:
-                print '> ' + str(rnacentral_id) + ' processed'
+                print( '> %s processed' % str(rnacentral_id) )
             else:
-                print '> an error has occurred while processing ' + str(rnacentral_id) + ' has been correctly processed'
+                print( '> an error has occurred while processing %s has been correctly processed' % str(rnacentral_id) )
         return OK_EXIT_CODE
     else:
-        print 'Error: at least one RNAcentral ID shoud be specified'
+        print( 'Error: at least one RNAcentral ID shoud be specified' )
         return raiseException( ERR_EXIT_CODE, 'Error: at least one RNAcentral ID shoud be specified', './', errorfile )
 
 def __main__():
@@ -168,14 +168,14 @@ def __main__():
 
     (options, args) = parser.parse_args()
     if options.version:
-        print 'Tool: ' + __version__ + '\n' + 'API: ' + __rnacentral_api_version__
+        print( 'Tool: %s \nAPI: %s' % ( __version__, __rnacentral_api_version__ ) )
     elif options.usage:
-        print usage
+        print( usage )
     else:
         if options.file and options.id:
-            print '--file and --id parameters can\'t be used at the same time'
+            print( '--file and --id parameters can\'t be used at the same time' )
         elif not options.file and not options.id:
-            print 'specify at least one parameter between --file and --id'
+            print( 'specify at least one parameter between --file and --id' )
         else:
             fasta_dir_path = options.fastadir
             # if fasta_dir_path does not exist -> create directory
