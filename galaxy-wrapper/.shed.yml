@@ -1,0 +1,20 @@
+name: rnacentral
+owner: iuc
+categories:
+  - Data Source
+description: RNAcentral data retrieval tool
+long_description: |
+  A python tool to interact with the public RNAcentral APIs and
+  automatically retrieve data
+remote_repository_url: https://github.com/fabio-cumbo/RNAcentral-data-retrieval-tool
+homepage_url: https://github.com/fabio-cumbo/RNAcentral-data-retrieval-tool
+type: unrestricted
+auto_tool_repositories:
+  name_template: "{{ tool_id }}"
+  descriptor_template: "Wrapper for RNAcentral: {{ tool_name }}."
+suite:
+  name: "rnacentral_suite"
+  description: "RNAcentral data retrieval tool"
+  long_description: |
+    A python tool to interact with the public RNAcentral APIs and
+    automatically retrieve data

@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<tool name="RNAcentral" id="rnacentral" version="1.0.0">
+    <description>data retrieval</description>
+    <requirements>
+        <requirement type="package" version="2.7.10">python</requirement>
+        <requirement type="package" version="2.18.4">requests</requirement>
+    </requirements>
+    <command detect_errors="exit_code">
+<![CDATA[
+    python '$__tool_directory__/rnacentral.py'
+    
+    --tree 1
+    --search 'rrr'
+    --sthreshold ${sthreshold}
+    --sort ${sortcontrol}
+    --exact 0
+    
+    #if $conditional_input.inputtype == '0':
+        #set file_paths = ','.join( [ str( $f ) for $f in $conditional_input.txtfiles ] )
+        #if $file_paths is not 'None':
+            --files '${file_paths}'
+            #set file_names = ','.join( [ str( $f.name ) for $f in $conditional_input.txtfiles ] )
+                --names '${file_names}'
+        #end if
+    #elif $conditional_input.inputtype == '1':
+        --sequences '${conditional_input.sequences}'
+    #end if
+
+    --outputdir 'collection_content'
+]]>
+    </command>
+    <inputs>
+        <conditional name="conditional_input">
+            <param name="inputtype" type="select" label="Input mode" help="Select a mode based on how do you want to specify the input">
+                <option value="0" selected="true">By file</option>
+                <option value="1">By manually inserted text</option>
+            </param>
+            <when value="0">
+                <param format="tabular" name="txtfiles" type="data" label="Select files" multiple="true" optional="false" help="Select one or more tabular files containing (ID, TRANSCRIPT) couples for each line. The content of these files will be merged and the result will represent a query to the Sequence Bloom Tree that will return a collection containing a file for each ID. The content of these files as result of the tool will be a list of accession numbers." />
+            </when>
+            <when value="1">
+                <param name="sequences" type="text" area="True" size="5x25" label="Manually insert sequences" optional="false" help="Insert a list of (ID, TRANSCRIPT) couples in a tab delimited format, one for each line. The content of this text box will represent a query to the Sequence Bloom Tree that will return a collection containing a file for each ID. The content of these files as result of the tool will be a list of accession numbers." />
+            </when>
+        </conditional>            
+        <param name="sthreshold" size="3" type="float" value="0.7" min="0.0" max="1.0" label="Search threshold" help="This threshold controls the specificity. Lower values will produce more hits to the query. Higher values are more stringent and will produce fewer hits." />
+        <param name="sortcontrol" type="boolean" checked="true" truevalue="1" falsevalue="0" label="Sort the result by the number of hits per transcript." />
+    </inputs>
+    <outputs>
+        <collection name="output_collect" type="list" label="BloomTree Manager - Query result collection">
+            <discover_datasets pattern="(?P&lt;identifier_0&gt;[^_]+)_(?P&lt;ext&gt;[^_]+)" directory="collection_content" ext="auto" />
+        </collection>
+    </outputs>
+
+    <help><![CDATA[
+This Query tool is part of the BloomTree Manager Framework that allow to rapidly identify all publicly available 
+sequenced samples which express a transcript of interest.
+
+----
+
+The input for this tool is a list of (ID, TRANSCRIPT) couples, one for each line,
+in a tab delimited format::
+    
+    id0  CCAACCAAAGGGAAAACTTTTTTCCGACTTTGGCCTAAAGGGTTTAACGGCCAAGTCAGAAGGGAAAAAGTTGCGCCA
+    id1  TTAATGACAGGGCCACATGATGTGAAAAAAAATCAGAAACCGAGTCAACGTGAGAAGATAGTACGTACTACCGCAAAT
+    ...
+    idn  CAATTAATGATAAATATTTTATAAGGTGCGGAAATAAAGTGAGGAATATCTTTTAAATTCAAGTTCAATTCTGAAAGC
+
+The ID can contain alphanumeric characters in addition to spaces, dots, dashes, and round and square brackets.
+Any additional character will be trimmed out.
+
+The output of the tool is a collection that contains a file for each ID with a list of
+accession numbers representing the samples that express one particular transcript.
+
+----
+
+.. class:: infomark
+
+**Notes**
+
+This Galaxy tool has been developed by Fabio Cumbo.
+
+Please visit this GithHub_repository_ for more information about the BloomTree Manager
+
+.. _GithHub_repository: https://github.com/fabio-cumbo/bloomtree-manager
+    ]]></help>
+
+    <citations>
+        <citation type="doi">10.1101/090464</citation>
+    </citations>
+</tool>
